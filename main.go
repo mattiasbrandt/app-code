@@ -12,12 +12,12 @@ import (
 
 // Data structures
 type Individual struct {
-	Name          string `json:"name"`
+	Name           string `json:"name"`
 	PersonalNumber string `json:"personalNumber"`
 }
 
 type Organization struct {
-	Name       string `json:"name"`
+	Name      string `json:"name"`
 	OrgNumber string `json:"orgNumber"`
 }
 
@@ -60,22 +60,32 @@ func main() {
 	} else {
 		fmt.Println("Invalid organization data")
 	}
+
+	// Set up a simple HTTP server
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, this is my Go/Dapr app!")
+	})
+
+	// Start listening on a port
+	fmt.Println("Listening on port 8080...")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
 
 // Save data to state store
 func saveData(client dapr.Client, storeName, key string, data interface{}) {
 	dataBytes, err := json.Marshal(data)
 	if err != nil {
-			log.Fatalf("Failed to marshal data: %v", err)
+		log.Fatalf("Failed to marshal data: %v", err)
 	}
 
 	// Adding an empty map for metadata
 	metadata := map[string]string{}
 
 	if err := client.SaveState(context.Background(), storeName, key, dataBytes, metadata); err != nil {
-			log.Fatalf("Failed to save state: %v", err)
+		log.Fatalf("Failed to save state: %v", err)
 	} else {
-			fmt.Printf("Data saved for key %s\n", key)
+		fmt.Printf("Data saved for key %s\n", key)
 	}
 }
-
